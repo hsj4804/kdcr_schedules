@@ -75,11 +75,12 @@
       transition: all 0.2s;
     }
     .btn:hover:not(:disabled) { background-color: #e9ecef; }
-    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn:disabled { opacity: 0.35; cursor: not-allowed; }
     .btn-primary { background-color: var(--primary-color); color: white; border: none; }
     .btn-primary:hover:not(:disabled) { background-color: #1864ab; }
     .btn-sm { padding: 4px 8px; font-size: 11px; }
     .btn-danger { background-color: var(--danger-color); color: white; border: none; }
+    .btn-danger:hover:not(:disabled) { background-color: #e03131; }
 
     /* 섹션 레이아웃 (외업 / 내업) */
     .section-container {
@@ -98,8 +99,8 @@
       align-items: center;
       gap: 8px;
     }
-    .badge-outdoor { background: #e7f5ff; color: #1971c2; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
-    .badge-indoor { background: #f3f0ff; color: #6741d9; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+    .badge-outdoor { background: #e7f5ff; color: #1971c2; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 700; }
+    .badge-indoor { background: #f3f0ff; color: #6741d9; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 700; }
 
     /* 테이블 스타일 */
     .timeline-wrapper { overflow-x: auto; }
@@ -125,29 +126,42 @@
     th.today-col { background-color: var(--today-header-bg) !important; color: #0ca678 !important; border-left: 2px solid var(--today-border) !important; border-right: 2px solid var(--today-border) !important; }
     td.today-col { background-color: var(--today-bg) !important; border-left: 2px solid var(--today-border) !important; border-right: 2px solid var(--today-border) !important; }
 
-    /* 일정 바 */
+    /* 타임라인 바 연속형 렌더링 스타일 */
     .cell-day { padding: 0; position: relative; cursor: pointer; }
     .cell-day:hover { filter: brightness(0.96); }
     
     .allocation-bar {
-      height: 28px;
+      height: 30px;
       margin: 4px 0;
       color: white;
       font-size: 11px;
       font-weight: 600;
       display: flex;
       align-items: center;
-      padding: 0 6px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+      padding: 0 4px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.12);
       user-select: none;
       position: relative;
       cursor: pointer;
     }
-    .bar-start { border-top-left-radius: 4px; border-bottom-left-radius: 4px; }
-    .bar-end { border-top-right-radius: 4px; border-bottom-right-radius: 4px; }
-    .bar-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; z-index: 1; }
+    .bar-start { border-top-left-radius: 4px; border-bottom-left-radius: 4px; margin-left: 2px; }
+    .bar-end { border-top-right-radius: 4px; border-bottom-right-radius: 4px; margin-right: 2px; }
+    .bar-middle { border-radius: 0; }
+    
+    /* 연속 텍스트가 바깥으로 이어지며 보이도록 처리 */
+    .bar-text-wrapper {
+      position: absolute;
+      left: 6px;
+      top: 0;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 2;
+    }
 
-    /* 범례 및 세부 투입공수 */
+    /* 범례 및 외업/내업 분리 상세 공수 */
     .legend-container {
       background: white;
       border: 1px solid var(--border-color);
@@ -157,27 +171,47 @@
     }
     .legend-title { font-weight: 700; font-size: 15px; color: #343a40; margin-bottom: 14px; border-bottom: 1px solid #eee; padding-bottom: 6px; }
     .legend-grid { display: flex; flex-direction: column; gap: 12px; }
-    .legend-row {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      padding: 8px 12px;
+    .legend-card {
       background: #f8f9fa;
-      border-radius: 6px;
-      font-size: 13px;
-      flex-wrap: wrap;
+      border-radius: 8px;
+      border: 1px solid #e9ecef;
+      padding: 12px 16px;
     }
-    .legend-proj-badge { display: flex; align-items: center; gap: 8px; font-weight: 700; min-width: 220px; }
+    .legend-card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+      font-weight: 700;
+      font-size: 14px;
+    }
     .color-badge { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; }
-    .legend-detail-box { display: flex; gap: 8px; flex-wrap: wrap; color: #495057; font-size: 12px; }
-    .sub-pill { background: white; border: 1px solid #ced4da; padding: 2px 8px; border-radius: 12px; }
+    .proj-code-tag { background: #e9ecef; color: #495057; font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: 800; }
+    
+    .legend-split-box {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      background: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid #e9ecef;
+      font-size: 12px;
+    }
+    @media (max-width: 768px) {
+      .legend-split-box { grid-template-columns: 1fr; }
+    }
+    .split-col { display: flex; flex-direction: column; gap: 4px; }
+    .split-title { font-weight: 700; font-size: 11px; display: flex; align-items: center; gap: 6px; }
+    .split-items { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+    .sub-pill { background: #f8f9fa; border: 1px solid #ced4da; padding: 2px 8px; border-radius: 10px; font-size: 11px; }
 
     /* 모달 */
     .modal-backdrop {
       display: none;
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.4);
+      background: rgba(0,0,0,0.45);
       z-index: 100;
       justify-content: center;
       align-items: center;
@@ -186,25 +220,43 @@
       background: white;
       padding: 24px;
       border-radius: 8px;
-      width: 460px;
-      max-width: 90%;
+      width: 480px;
+      max-width: 92%;
       max-height: 85vh;
       overflow-y: auto;
-      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
     }
     .modal h3 { margin-bottom: 16px; font-size: 18px; border-bottom: 2px solid #f1f3f5; padding-bottom: 8px; }
     .form-group { margin-bottom: 14px; }
-    .form-group label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: #495057; }
+    .form-group label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: #495057; }
     .form-group select, .form-group input[type="text"], .form-group input[type="date"] {
       width: 100%; padding: 8px; border: 1px solid #ced4da; border-radius: 4px; font-size: 13px;
     }
     .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
 
-    .manage-section { margin-bottom: 20px; }
+    /* 20색 전용 팔레트 그리드 */
+    .color-palette-grid {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .palette-circle {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: transform 0.15s, border-color 0.15s;
+    }
+    .palette-circle:hover { transform: scale(1.15); }
+    .palette-circle.active { border-color: #212529; box-shadow: 0 0 0 2px rgba(0,0,0,0.2); }
+
+    .manage-section { margin-bottom: 24px; }
     .manage-section h4 { font-size: 14px; color: #495057; margin-bottom: 8px; }
     .add-row { display: flex; gap: 8px; margin-bottom: 10px; }
-    .item-list { list-style: none; border: 1px solid #e9ecef; border-radius: 4px; max-height: 180px; overflow-y: auto; }
-    .item-list li { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; border-bottom: 1px solid #e9ecef; font-size: 13px; }
+    .item-list { list-style: none; border: 1px solid #e9ecef; border-radius: 4px; max-height: 200px; overflow-y: auto; }
+    .item-list li { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; border-bottom: 1px solid #e9ecef; font-size: 13px; }
     .item-list li:last-child { border-bottom: none; }
     .item-info { display: flex; align-items: center; gap: 8px; }
     .item-actions { display: flex; gap: 4px; }
@@ -236,7 +288,7 @@
   <!-- 1. [외업] 현장투입인원 섹션 -->
   <div class="section-container">
     <div class="section-title">
-      <span class="badge-outdoor">현장</span>
+      <span class="badge-outdoor">외업</span>
       <span>[외업] 현장투입인원</span>
     </div>
     <div class="timeline-wrapper">
@@ -253,7 +305,7 @@
   <!-- 2. [내업] 투입인원 섹션 -->
   <div class="section-container">
     <div class="section-title">
-      <span class="badge-indoor">사무실</span>
+      <span class="badge-indoor">내업</span>
       <span>[내업] 투입인원</span>
     </div>
     <div class="timeline-wrapper">
@@ -267,9 +319,9 @@
     </div>
   </div>
 
-  <!-- 3. 범례 및 상세 공수 -->
+  <!-- 3. 범례 및 외업/내업 분리 당월 투입공수 -->
   <div class="legend-container">
-    <div class="legend-title">프로젝트별 당월 투입공수 (외업 / 내업 통합 및 인원별 실투입 상세)</div>
+    <div class="legend-title">프로젝트별 당월 투입공수 (외업 / 내업 구분 및 인원별 실투입 상세)</div>
     <div class="legend-grid" id="legendGrid"></div>
   </div>
 
@@ -312,6 +364,8 @@
   <div class="modal-backdrop" id="settingsModalBackdrop">
     <div class="modal">
       <h3>자원 및 프로젝트 관리</h3>
+      
+      <!-- 인원 관리 -->
       <div class="manage-section">
         <h4>👤 자원(인원) 관리 (▲▼ 버튼으로 순서 변경)</h4>
         <div class="add-row">
@@ -321,12 +375,19 @@
         <ul class="item-list" id="resourceListUI"></ul>
       </div>
 
+      <!-- 프로젝트 관리 -->
       <div class="manage-section">
-        <h4>📁 프로젝트 관리</h4>
-        <div class="add-row">
-          <input type="text" id="newProjectName" placeholder="새 프로젝트명" style="flex:1; padding: 6px; border:1px solid #ced4da; border-radius:4px; font-size:13px;">
-          <input type="color" id="newProjectColor" value="#1971c2" style="width:36px; height:31px; border:none; cursor:pointer;">
-          <button class="btn btn-primary btn-sm" onclick="addProject()">추가</button>
+        <h4>📁 프로젝트 관리 (자동 No. 부여 & ▲▼ 순서 변경)</h4>
+        <div class="form-group" style="margin-bottom:8px;">
+          <label>새 프로젝트명 입력</label>
+          <div class="add-row">
+            <input type="text" id="newProjectName" placeholder="새 프로젝트명" style="flex:1; padding: 6px; border:1px solid #ced4da; border-radius:4px; font-size:13px;">
+            <button class="btn btn-primary btn-sm" onclick="addProject()">추가</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>프로젝트 색상 선택 (20개 전용 팔레트)</label>
+          <div class="color-palette-grid" id="newProjectPalette"></div>
         </div>
         <ul class="item-list" id="projectListUI"></ul>
       </div>
@@ -337,20 +398,39 @@
     </div>
   </div>
 
+  <!-- 프로젝트 색상/이름 수정 전용 모달 -->
+  <div class="modal-backdrop" id="editProjectModalBackdrop">
+    <div class="modal" style="width: 400px;">
+      <h3>프로젝트 수정</h3>
+      <div class="form-group">
+        <label>프로젝트명</label>
+        <input type="text" id="editProjectName">
+      </div>
+      <div class="form-group">
+        <label>프로젝트 색상 변경</label>
+        <div class="color-palette-grid" id="editProjectPalette"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn" onclick="closeEditProjectModal()">취소</button>
+        <button class="btn btn-primary" onclick="saveEditedProject()">수정 완료</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // -----------------------------------------------------------------
     // 1. Firebase 구성
     // -----------------------------------------------------------------
     const firebaseConfig = {
-      apiKey: "AIzaSyAsmi5dICGFMQIs84_qOuK01STDQ90bddo",
-      authDomain: "team-kdcr.firebaseapp.com",
-      databaseURL: "https://team-kdcr-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "team-kdcr",
-      storageBucket: "team-kdcr.firebasestorage.app",
-      messagingSenderId: "454970565368",
-      appId: "1:454970565368:web:44e0d034f2aa839384110d",
-      measurementId: "G-VG3SZLEJ5R"
-    };
+       apiKey: "AIzaSyAsmi5dICGFMQIs84_qOuK01STDQ90bddo",
+       authDomain: "team-kdcr.firebaseapp.com",
+       databaseURL: "https://team-kdcr-default-rtdb.asia-southeast1.firebasedatabase.app",
+       projectId: "team-kdcr",
+       storageBucket: "team-kdcr.firebasestorage.app",
+       messagingSenderId: "454970565368",
+       appId: "1:454970565368:web:44e0d034f2aa839384110d",
+  measurementId: "G-VG3SZLEJ5R"
+};
 
     let db = null;
     try {
@@ -361,7 +441,21 @@
     }
 
     // -----------------------------------------------------------------
-    // 2. 상태 관리 및 법정공휴일 엔진
+    // 2. 20가지 전용 고대비 색상 팔레트 상수 정의
+    // -----------------------------------------------------------------
+    const DISTINCT_20_COLORS = [
+      "#1971c2", "#2f9e44", "#e03131", "#f59f00", "#7048e8",
+      "#0c8599", "#d6336c", "#099268", "#e8590c", "#4c6ef5",
+      "#37b24d", "#f76707", "#ae3ec9", "#1098ad", "#d9480f",
+      "#4263eb", "#2b8a3e", "#c92a2a", "#5f3dc4", "#1864ab"
+    ];
+
+    let selectedNewProjectColor = DISTINCT_20_COLORS[0];
+    let editingProjectId = null;
+    let selectedEditProjectColor = DISTINCT_20_COLORS[0];
+
+    // -----------------------------------------------------------------
+    // 3. 상태 관리 및 법정공휴일 데이터
     // -----------------------------------------------------------------
     const todayObj = new Date();
     const todayYear = todayObj.getFullYear();
@@ -379,17 +473,15 @@
     ];
 
     let projects = [
-      { id: "p1", name: "A 안전진단 (교량)", color: "#1971c2" },
-      { id: "p2", name: "B 정밀진단 (건축물)", color: "#2f9e44" },
-      { id: "p3", name: "C 정기점검 (터널)", color: "#f59f00" }
+      { id: "p1", code: "P01", name: "A 안전진단 (교량)", color: DISTINCT_20_COLORS[0] },
+      { id: "p2", code: "P02", name: "B 정밀진단 (건축물)", color: DISTINCT_20_COLORS[1] },
+      { id: "p3", code: "P03", name: "C 정기점검 (터널)", color: DISTINCT_20_COLORS[3] }
     ];
 
-    // allocations에 type: 'OUTDOOR' | 'INDOOR' 구분자 내장
     let allocations = [];
 
     const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
 
-    // 법정공휴일 사전 데이터 (관공서의 공휴일에 관한 규정 기준 완벽 검증)
     const officialHolidays = {
       "2025": {
         "01-01": "신정", "01-28": "설날연휴", "01-29": "설날", "01-30": "설날연휴",
@@ -415,28 +507,27 @@
 
     let holidaysCache = {};
 
-    // 공휴일 실시간 로딩 (API 시도 후 Fallback 데이터 적용)
     async function loadHolidays(year) {
       if (holidaysCache[year]) return holidaysCache[year];
-      // 오픈 공공데이터 연동 시도 (네트워크 환경에 구애받지 않도록 Fallback 완벽 구비)
       const data = officialHolidays[String(year)] || {};
       holidaysCache[year] = data;
       return data;
     }
 
     document.addEventListener("DOMContentLoaded", async () => {
+      buildPaletteUI('newProjectPalette', (color) => { selectedNewProjectColor = color; }, selectedNewProjectColor);
       await loadHolidays(viewYear);
       initRealtimeSync();
       render();
     });
 
     // -----------------------------------------------------------------
-    // 3. Firebase 실시간 통신
+    // 4. Firebase 실시간 동기화
     // -----------------------------------------------------------------
     function initRealtimeSync() {
       if (!db || firebaseConfig.apiKey === "YOUR_API_KEY") {
         document.getElementById('statusDot').style.background = '#fa5252';
-        document.getElementById('statusText').textContent = '⚠️ Firebase 설정 정보가 입력되지 않았습니다. (코드 내 firebaseConfig 수정 필요)';
+        document.getElementById('statusText').textContent = '⚠️ Firebase 설정 정보가 입력되지 않았습니다. (스코드 내 firebaseConfig 수정 필요)';
         return;
       }
 
@@ -446,12 +537,14 @@
           resources = data.resources || [];
           projects = data.projects || [];
           allocations = data.allocations || [];
+          ensureProjectCodes(); // 번호 무결성 검증
         } else {
+          ensureProjectCodes();
           saveToFirebase();
         }
 
         document.getElementById('statusDot').style.background = '#40c057';
-        document.getElementById('statusText').textContent = '🟢 실시간 클라우드 연결됨 (동시 편집 및 중복 검증 활성화)';
+        document.getElementById('statusText').textContent = '🟢 실시간 클라우드 연결됨 (동시 편집 활성화)';
         render();
       }, (error) => {
         document.getElementById('statusDot').style.background = '#fa5252';
@@ -469,8 +562,15 @@
       }
     }
 
+    // 프로젝트 자동 코드(P01, P02...) 동기화
+    function ensureProjectCodes() {
+      projects.forEach((p, idx) => {
+        p.code = `P${String(idx + 1).padStart(2, '0')}`;
+      });
+    }
+
     // -----------------------------------------------------------------
-    // 4. UI 랜더링 (외업 / 내업 2단 테이블)
+    // 5. UI 랜더링 (연속 텍스트 및 외업/내업 테이블)
     // -----------------------------------------------------------------
     async function render() {
       document.getElementById('currentMonthTitle').textContent = `${viewYear}년 ${viewMonth}월`;
@@ -501,9 +601,7 @@
         const holidayName = holidays[mdKey] || null;
 
         const isToday = (viewYear === todayYear && viewMonth === todayMonth && day === todayDay);
-        const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
 
-        // 일자 헤더
         const thDate = document.createElement('th');
         thDate.className = 'day-header';
         if (dayOfWeek === 6) thDate.classList.add('sat-header');
@@ -517,7 +615,6 @@
         `;
         dateRow.appendChild(thDate);
 
-        // 요일 헤더
         const thDay = document.createElement('th');
         thDay.className = 'day-header';
         if (dayOfWeek === 6) thDay.classList.add('sat-header');
@@ -552,17 +649,14 @@
           const mdKey = currentDateStr.substring(5);
           const holidayName = holidays[mdKey] || null;
 
-          // 스타일 클래스 적용 (주말: 회색, 공휴일: 분홍, 당일: 에메랄드)
           if (dayOfWeek === 0 || dayOfWeek === 6) td.classList.add('weekend-cell');
           if (holidayName) td.classList.add('holiday-cell');
           if (viewYear === todayYear && viewMonth === todayMonth && day === todayDay) td.classList.add('today-col');
 
-          // 빈 셀 클릭 시 업무 구분에 맞게 즉시 모달 연결
           td.onclick = () => {
             openAllocationModal(null, res.id, currentDateStr, workType);
           };
 
-          // 해당 일자 & 자원 & 업무구분에 일치하는 일정 추출
           const activeAlloc = allocations.find(a => 
             a.resourceId === res.id &&
             a.type === workType &&
@@ -576,19 +670,23 @@
               const bar = document.createElement('div');
               bar.className = 'allocation-bar';
               bar.style.backgroundColor = project.color;
-              if (project.color.toLowerCase() === '#ffdd57' || project.color.toLowerCase() === '#ffd43b') bar.style.color = '#333';
 
-              if (currentDateStr === activeAlloc.startDate) bar.classList.add('bar-start');
-              if (currentDateStr === activeAlloc.endDate) bar.classList.add('bar-end');
+              const isStart = (currentDateStr === activeAlloc.startDate);
+              const isEnd = (currentDateStr === activeAlloc.endDate);
 
-              if (currentDateStr === activeAlloc.startDate || day === 1) {
-                const textSpan = document.createElement('span');
-                textSpan.className = 'bar-text';
-                textSpan.textContent = project.name;
-                bar.appendChild(textSpan);
+              if (isStart) bar.classList.add('bar-start');
+              if (isEnd) bar.classList.add('bar-end');
+              if (!isStart && !isEnd) bar.classList.add('bar-middle');
+
+              // 연속된 텍스트가 바 전체에 걸쳐 보이도록 시작 셀 또는 월초 셀에 텍스트 래퍼 추가
+              if (isStart || day === 1) {
+                const textWrapper = document.createElement('div');
+                textWrapper.className = 'bar-text-wrapper';
+                textWrapper.textContent = `[${project.code}] ${project.name}`;
+                bar.appendChild(textWrapper);
               }
 
-              bar.title = `[${workType === 'OUTDOOR' ? '외업' : '내업'}] ${project.name} (${activeAlloc.startDate} ~ ${activeAlloc.endDate})\n클릭 시 수정/삭제`;
+              bar.title = `[${workType === 'OUTDOOR' ? '외업' : '내업'}] [${project.code}] ${project.name} (${activeAlloc.startDate} ~ ${activeAlloc.endDate})\n클릭 시 수정/삭제`;
 
               bar.onclick = (e) => {
                 e.stopPropagation();
@@ -605,7 +703,7 @@
     }
 
     // -----------------------------------------------------------------
-    // 5. 하단 범례 및 인원별 실투입 상세 공수 집계
+    // 6. 하단 범례: 외업/내업 분리 집계
     // -----------------------------------------------------------------
     function renderLegend(totalDays) {
       const legendGrid = document.getElementById('legendGrid');
@@ -615,10 +713,11 @@
       const monthEnd = formatDate(viewYear, viewMonth, totalDays);
 
       projects.forEach(p => {
-        let totalProjManDays = 0;
-        const resourceMDMap = {};
+        let outdoorTotal = 0;
+        let indoorTotal = 0;
+        const outdoorResMap = {};
+        const indoorResMap = {};
 
-        // 프로젝트에 매핑된 전체 일정 순회
         allocations.filter(a => a.projectId === p.id).forEach(a => {
           const start = a.startDate < monthStart ? monthStart : a.startDate;
           const end = a.endDate > monthEnd ? monthEnd : a.endDate;
@@ -627,37 +726,53 @@
             const sDate = new Date(start);
             const eDate = new Date(end);
             const diffDays = Math.round((eDate - sDate) / (1000 * 60 * 60 * 24)) + 1;
-            
-            totalProjManDays += diffDays;
-            resourceMDMap[a.resourceId] = (resourceMDMap[a.resourceId] || 0) + diffDays;
+
+            if (a.type === 'INDOOR') {
+              indoorTotal += diffDays;
+              indoorResMap[a.resourceId] = (indoorResMap[a.resourceId] || 0) + diffDays;
+            } else {
+              outdoorTotal += diffDays;
+              outdoorResMap[a.resourceId] = (outdoorResMap[a.resourceId] || 0) + diffDays;
+            }
           }
         });
 
-        // 인원별 투입공수 텍스트 리스트 구성
-        const detailBadges = Object.keys(resourceMDMap).map(resId => {
-          const res = resources.find(r => r.id === resId);
-          const rName = res ? res.name : "미지정";
-          return `<span class="sub-pill">${rName}: <b>${resourceMDMap[resId]} M/D</b></span>`;
-        }).join('');
+        const outdoorPills = Object.keys(outdoorResMap).map(rId => {
+          const rName = resources.find(r => r.id === rId)?.name || "미지정";
+          return `<span class="sub-pill">${rName}: <b>${outdoorResMap[rId]} M/D</b></span>`;
+        }).join('') || '<span style="color:#adb5bd; font-size:11px;">외업 투입 없음</span>';
 
-        const row = document.createElement('div');
-        row.className = 'legend-row';
-        row.innerHTML = `
-          <div class="legend-proj-badge">
+        const indoorPills = Object.keys(indoorResMap).map(rId => {
+          const rName = resources.find(r => r.id === rId)?.name || "미지정";
+          return `<span class="sub-pill">${rName}: <b>${indoorResMap[rId]} M/D</b></span>`;
+        }).join('') || '<span style="color:#adb5bd; font-size:11px;">내업 투입 없음</span>';
+
+        const card = document.createElement('div');
+        card.className = 'legend-card';
+        card.innerHTML = `
+          <div class="legend-card-header">
+            <span class="proj-code-tag">${p.code}</span>
             <div class="color-badge" style="background-color: ${p.color};"></div>
             <span>${p.name}</span>
-            <span style="color:#1971c2; font-size:12px;">(합계: ${totalProjManDays} M/D)</span>
+            <span style="color:#1971c2; font-size:12px; margin-left:auto;">총 합계: ${outdoorTotal + indoorTotal} M/D</span>
           </div>
-          <div class="legend-detail-box">
-            ${detailBadges || '<span style="color:#adb5bd; font-size:11px;">당월 투입 없음</span>'}
+          <div class="legend-split-box">
+            <div class="split-col">
+              <div class="split-title"><span class="badge-outdoor">외업</span> 외업 합계: <b>${outdoorTotal} M/D</b></div>
+              <div class="split-items">${outdoorPills}</div>
+            </div>
+            <div class="split-col">
+              <div class="split-title"><span class="badge-indoor">내업</span> 내업 합계: <b>${indoorTotal} M/D</b></div>
+              <div class="split-items">${indoorPills}</div>
+            </div>
           </div>
         `;
-        legendGrid.appendChild(row);
+        legendGrid.appendChild(card);
       });
     }
 
     // -----------------------------------------------------------------
-    // 6. 엄격한 일정 중복 검증 & 등록/수정/삭제
+    // 7. 모달 및 일정 CRUD (중복 방지 포함)
     // -----------------------------------------------------------------
     function openAllocationModal(allocId = null, resourceId = null, dateStr = null, defaultWorkType = 'OUTDOOR') {
       if (resources.length === 0 || projects.length === 0) {
@@ -669,7 +784,7 @@
       resSelect.innerHTML = resources.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
 
       const projSelect = document.getElementById('modalProject');
-      projSelect.innerHTML = projects.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+      projSelect.innerHTML = projects.map(p => `<option value="${p.id}">[${p.code}] ${p.name}</option>`).join('');
 
       const workTypeSelect = document.getElementById('modalWorkType');
       const deleteBtn = document.getElementById('btnDeleteAlloc');
@@ -719,14 +834,10 @@
         return;
       }
 
-      // [핵심 검증] 동일 인원의 동일 일자 중복 방지 (외업 ↔ 내업 간 일정 겹침 완전 차단)
       const hasConflict = allocations.some(a => {
-        if (editingAllocId && a.id === editingAllocId) return false; // 수정 중인 자기 자신 제외
-        if (a.resourceId !== resId) return false; // 다른 인원은 무관
-
-        // 날짜 겹침 판정: (A 시작일 <= B 종료일) && (A 종료일 >= B 시작일)
-        const isDateOverlap = (startDate <= a.endDate) && (endDate >= a.startDate);
-        return isDateOverlap;
+        if (editingAllocId && a.id === editingAllocId) return false;
+        if (a.resourceId !== resId) return false;
+        return (startDate <= a.endDate) && (endDate >= a.startDate);
       });
 
       if (hasConflict) {
@@ -761,7 +872,6 @@
 
     function deleteAllocation() {
       if (!editingAllocId) return;
-
       if (confirm('해당 투입 일정을 삭제하시겠습니까?')) {
         allocations = allocations.filter(a => a.id !== editingAllocId);
         saveToFirebase();
@@ -770,9 +880,31 @@
     }
 
     // -----------------------------------------------------------------
-    // 7. 자원 및 프로젝트 설정 관리
+    // 8. 20색 전용 팔레트 렌더러
+    // -----------------------------------------------------------------
+    function buildPaletteUI(containerId, onSelectCallback, defaultSelectedColor) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = '';
+      DISTINCT_20_COLORS.forEach(color => {
+        const circle = document.createElement('div');
+        circle.className = 'palette-circle';
+        circle.style.backgroundColor = color;
+        if (color === defaultSelectedColor) circle.classList.add('active');
+
+        circle.onclick = () => {
+          Array.from(container.children).forEach(c => c.classList.remove('active'));
+          circle.classList.add('active');
+          onSelectCallback(color);
+        };
+        container.appendChild(circle);
+      });
+    }
+
+    // -----------------------------------------------------------------
+    // 9. 자원 및 프로젝트 관리 (자동 넘버링 및 순서 변경)
     // -----------------------------------------------------------------
     function openSettingsModal() {
+      ensureProjectCodes();
       renderSettingsLists();
       document.getElementById('settingsModalBackdrop').style.display = 'flex';
     }
@@ -783,6 +915,7 @@
     }
 
     function renderSettingsLists() {
+      // 자원 리스트
       const resUI = document.getElementById('resourceListUI');
       resUI.innerHTML = resources.map((r, index) => `
         <li>
@@ -796,29 +929,44 @@
         </li>
       `).join('');
 
+      // 프로젝트 리스트 (자동 코드 표시 및 상하 이동)
       const projUI = document.getElementById('projectListUI');
-      projUI.innerHTML = projects.map(p => `
+      projUI.innerHTML = projects.map((p, index) => `
         <li>
           <div class="item-info">
+            <span class="proj-code-tag">${p.code}</span>
             <span class="color-badge" style="background-color:${p.color}"></span>
             <span>${p.name}</span>
           </div>
           <div class="item-actions">
-            <button class="btn btn-sm" onclick="editProject('${p.id}')">수정</button>
+            <button class="btn btn-sm" onclick="moveProject(${index}, -1)" ${index === 0 ? 'disabled' : ''}>▲</button>
+            <button class="btn btn-sm" onclick="moveProject(${index}, 1)" ${index === projects.length - 1 ? 'disabled' : ''}>▼</button>
+            <button class="btn btn-sm" onclick="openEditProjectModal('${p.id}')">수정</button>
             <button class="btn btn-sm btn-danger" onclick="deleteProject('${p.id}')">삭제</button>
           </div>
         </li>
       `).join('');
     }
 
+    // 자원 순서 이동
     function moveResource(index, direction) {
       const targetIndex = index + direction;
       if (targetIndex < 0 || targetIndex >= resources.length) return;
-
       const temp = resources[index];
       resources[index] = resources[targetIndex];
       resources[targetIndex] = temp;
+      saveToFirebase();
+      renderSettingsLists();
+    }
 
+    // 프로젝트 순서 이동 및 코드 재부여
+    function moveProject(index, direction) {
+      const targetIndex = index + direction;
+      if (targetIndex < 0 || targetIndex >= projects.length) return;
+      const temp = projects[index];
+      projects[index] = projects[targetIndex];
+      projects[targetIndex] = temp;
+      ensureProjectCodes();
       saveToFirebase();
       renderSettingsLists();
     }
@@ -827,7 +975,6 @@
       const input = document.getElementById('newResourceName');
       const name = input.value.trim();
       if (!name) return alert('자원 이름을 입력하세요.');
-
       resources.push({ id: 'r_' + Date.now(), name });
       input.value = '';
       saveToFirebase();
@@ -846,7 +993,7 @@
     }
 
     function deleteResource(id) {
-      if (confirm('이 자원을 삭제하시겠습니까? 외업/내업에 등록된 해당 인원의 모든 일정도 함께 삭제됩니다.')) {
+      if (confirm('이 자원을 삭제하시겠습니까? 관련된 모든 일정도 함께 삭제됩니다.')) {
         resources = resources.filter(r => r.id !== id);
         allocations = allocations.filter(a => a.resourceId !== id);
         saveToFirebase();
@@ -856,38 +1003,69 @@
 
     function addProject() {
       const nameInput = document.getElementById('newProjectName');
-      const colorInput = document.getElementById('newProjectColor');
       const name = nameInput.value.trim();
       if (!name) return alert('프로젝트명을 입력하세요.');
 
-      projects.push({ id: 'p_' + Date.now(), name, color: colorInput.value });
+      projects.push({
+        id: 'p_' + Date.now(),
+        code: `P${String(projects.length + 1).padStart(2, '0')}`,
+        name,
+        color: selectedNewProjectColor
+      });
+
       nameInput.value = '';
       saveToFirebase();
       renderSettingsLists();
     }
 
-    function editProject(id) {
-      const proj = projects.find(p => p.id === id);
+    // 프로젝트 수정 모달
+    function openEditProjectModal(projId) {
+      const proj = projects.find(p => p.id === projId);
       if (!proj) return;
-      const newName = prompt('수정할 프로젝트명을 입력하세요:', proj.name);
-      if (newName && newName.trim() !== '') {
-        proj.name = newName.trim();
-        saveToFirebase();
-        renderSettingsLists();
-      }
+
+      editingProjectId = projId;
+      document.getElementById('editProjectName').value = proj.name;
+      selectedEditProjectColor = proj.color || DISTINCT_20_COLORS[0];
+
+      buildPaletteUI('editProjectPalette', (color) => {
+        selectedEditProjectColor = color;
+      }, selectedEditProjectColor);
+
+      document.getElementById('editProjectModalBackdrop').style.display = 'flex';
+    }
+
+    function closeEditProjectModal() {
+      document.getElementById('editProjectModalBackdrop').style.display = 'none';
+      editingProjectId = null;
+    }
+
+    function saveEditedProject() {
+      const proj = projects.find(p => p.id === editingProjectId);
+      if (!proj) return;
+
+      const newName = document.getElementById('editProjectName').value.trim();
+      if (!newName) return alert('프로젝트명을 입력하세요.');
+
+      proj.name = newName;
+      proj.color = selectedEditProjectColor;
+
+      saveToFirebase();
+      closeEditProjectModal();
+      renderSettingsLists();
     }
 
     function deleteProject(id) {
-      if (confirm('이 프로젝트를 삭제하시겠습니까? 관련된 외업/내업 일정도 함께 삭제됩니다.')) {
+      if (confirm('이 프로젝트를 삭제하시겠습니까? 관련된 모든 일정도 함께 삭제됩니다.')) {
         projects = projects.filter(p => p.id !== id);
         allocations = allocations.filter(a => a.projectId !== id);
+        ensureProjectCodes();
         saveToFirebase();
         renderSettingsLists();
       }
     }
 
     // -----------------------------------------------------------------
-    // 8. 날짜 유틸리티
+    // 10. 날짜 유틸리티
     // -----------------------------------------------------------------
     async function changeMonth(diff) {
       viewMonth += diff;
