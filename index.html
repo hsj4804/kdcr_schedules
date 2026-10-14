@@ -418,8 +418,8 @@
   </div>
 
   <script>
-    // -----------------------------------------------------------------
-    // 1. Firebase 구성
+   // -----------------------------------------------------------------
+    // 1. Firebase 구성 및 인증/데이터베이스 초기화
     // -----------------------------------------------------------------
     const firebaseConfig = {
       apiKey: "AIzaSyAsmi5dICGFMQIs84_qOuK01STDQ90bddo",
@@ -429,12 +429,15 @@
       storageBucket: "team-kdcr.firebasestorage.app",
       messagingSenderId: "454970565368",
       appId: "1:454970565368:web:44e0d034f2aa839384110d",
-      measurementId: "G-VG3SZLEJ5R
+      measurementId: "G-VG3SZLEJ5R"
     };
 
     let db = null;
+    let auth = null;
+
     try {
       firebase.initializeApp(firebaseConfig);
+      auth = firebase.auth();
       db = firebase.database();
     } catch (err) {
       console.error("Firebase 초기화 에러:", err);
